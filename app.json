@@ -2,6 +2,12 @@
   "expo": {
     "name": "NearHelp",
     "slug": "NearHelp",
-    "version": "1.0.0"
+    "version": "1.0.0",
+    "android": {
+      "package": "com.mumtaz666raza2.NearHelp"
+    },
+    "ios": {
+      "bundleIdentifier": "com.mumtaz666raza2.NearHelp"
+    }
   }
 }
