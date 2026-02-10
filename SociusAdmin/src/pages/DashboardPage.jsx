@@ -1,0 +1,88 @@
+import React from 'react';
+
+const MetricCard = ({ title, value, subtitle }) => (
+  <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col h-full">
+    <div className="p-5 flex-1 flex flex-col">
+      <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200">{title}</h3>
+      <div className="flex-1 flex items-center justify-center mt-2 mb-2">
+        <span className="text-6xl font-bold text-gray-800 dark:text-white tracking-tight">
+          {value}
+        </span>
+      </div>
+    </div>
+    <div className="bg-gray-50 dark:bg-gray-700/50 px-4 py-2 border-t border-gray-100 dark:border-gray-700">
+      <div className="text-sm text-center text-gray-500 dark:text-gray-400">
+        {subtitle}
+      </div>
+    </div>
+  </div>
+);
+
+const SystemStatusCard = () => (
+  <div className="bg-white dark:bg-gray-800 shadow rounded-lg border border-gray-200 dark:border-gray-700 flex flex-col h-full">
+    <div className="p-5">
+      <h3 className="text-sm font-bold text-gray-700 dark:text-gray-200 mb-2">System Status</h3>
+      <div className="border-b border-gray-100 dark:border-gray-700 mb-4"></div>
+      <div className="space-y-4 pl-2">
+        <StatusItem label="Notifications" status="OK" />
+        <StatusItem label="Database" status="OK" />
+        <StatusItem label="Location Services" status="OK" />
+      </div>
+    </div>
+  </div>
+);
+
+const StatusItem = ({ label, status }) => (
+  <div className="flex items-center">
+    <div className="h-2.5 w-2.5 rounded-full bg-green-600 mr-3"></div>
+    <p className="text-sm text-gray-700 dark:text-gray-300">
+      {label}: <span className="font-bold text-green-700 dark:text-green-500">{status}</span>
+    </p>
+  </div>
+);
+
+const DashboardPage = () => {
+  return (
+    <div className="flex flex-col h-full justify-between">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Row 1 */}
+        <MetricCard 
+          title="Active Awareness Requests" 
+          value="15" 
+          subtitle="Currently open" 
+        />
+        <MetricCard 
+          title="Resolved Today" 
+          value="8" 
+          subtitle="Calm or cancelled" 
+        />
+        <MetricCard 
+          title="Volunteers Available Now" 
+          value="42" 
+          subtitle="Self-reported availability" 
+        />
+
+        {/* Row 2 */}
+        <MetricCard 
+          title="Pending Verifications" 
+          value="23" 
+          subtitle="Identity & profile review" 
+        />
+        <MetricCard 
+          title="Safety Flags" 
+          value="17" 
+          subtitle="System or user-generated" 
+        />
+        <SystemStatusCard />
+      </div>
+
+      <div className="mt-8 text-center pb-4">
+        <p className="text-xs text-gray-500 dark:text-gray-400">
+          This dashboard provides high-level visibility only. All user actions remain voluntary and independent.
+        </p>
+      </div>
+    </div>
+  );
+};
+
+export default DashboardPage;

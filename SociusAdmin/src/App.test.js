@@ -1,8 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
+import { ThemeProvider } from './context/ThemeContext';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+test('renders Socius Admin title', () => {
+  render(
+    <ThemeProvider>
+      <App />
+    </ThemeProvider>
+  );
+  const titleElement = screen.getByText(/Socius Admin/i);
+  expect(titleElement).toBeInTheDocument();
 });
