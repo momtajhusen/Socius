@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "Socius",
+    "slug": "Socius",
+    "version": "1.0.0",
+    "newArchEnabled": true,
+    "orientation": "portrait",
+    "android": {
+      "package": "com.mumtaz666raza2.Socius"
+    },
+    "ios": {
+      "bundleIdentifier": "com.mumtaz666raza2.Socius"
+    }
+  }
+}
