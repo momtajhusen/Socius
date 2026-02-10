@@ -10,7 +10,7 @@ const categories = [
   { key: 'guide', label: '✅ Guide for Users' },
   { key: 'home', label: '✅ Home Flow' },
   { key: 'prepare', label: 'Prepare' },
-  { key: 'community', label: 'Community' },
+  { key: 'community', label: '✅ Community' },
   { key: 'awareness', label: 'Awareness' },
   { key: 'modals', label: 'Modals' },
 ];

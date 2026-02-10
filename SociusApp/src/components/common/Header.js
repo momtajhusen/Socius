@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   Text,
   StyleSheet,
-  SafeAreaView,
   Image,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const Header = ({
@@ -18,11 +18,13 @@ const Header = ({
   onBackPress,
   rightComponent = null,
   backButton = true,
+  backIcon = 'arrow-left',
   backgroundColor = '#FFFFFF',
   style,
+  titleStyle,
 }) => {
   return (
-    <SafeAreaView style={[styles.safeArea, { backgroundColor }]}>
+    <SafeAreaView edges={['top']} style={[styles.safeArea, { backgroundColor }]}>
       <View style={[styles.container, { backgroundColor }, style]}>
         <View style={styles.leftSection}>
           {backButton && onBackPress && (
@@ -31,19 +33,23 @@ const Header = ({
               onPress={onBackPress}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
             >
-              <Icon name="arrow-left" size={24} color="#A83A30" />
+              <Icon name={backIcon} size={24} color="#A83A30" />
             </TouchableOpacity>
           )}
         </View>
 
         <View style={styles.centerSection}>
-          <View style={styles.centerBrand}>
-            <Image
-              source={require('../../assets/icons/icon-04.png')}
-              style={styles.logoImage}
-            />
-            <Text style={styles.brandText}>Socius</Text>
-          </View>
+          {title ? (
+            <Text style={[styles.headerTitle, titleStyle]}>{title}</Text>
+          ) : (
+            <View style={styles.centerBrand}>
+              <Image
+                source={require('../../assets/icons/icon-04.png')}
+                style={styles.logoImage}
+              />
+              <Text style={styles.brandText}>Socius</Text>
+            </View>
+          )}
         </View>
 
         <View style={styles.rightSection}>
@@ -96,6 +102,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '700',
     color: '#2C3E50',
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#2C3E50',
+    textAlign: 'center',
   },
 });
 

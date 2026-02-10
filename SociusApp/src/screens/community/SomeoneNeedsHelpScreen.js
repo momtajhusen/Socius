@@ -20,54 +20,51 @@ const SomeoneNeedsHelpScreen = ({ navigation }) => {
         style={{ borderBottomWidth: 1, borderBottomColor: '#E8EAED' }}
       />
       <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
-        <Text style={styles.pageTitle}>Someone Nearby Needs Help</Text>
+        <Text style={styles.pageTitle}>Local Help Request</Text>
 
-        <View style={styles.personCard}>
-          <View style={styles.avatar}>
-            <Icon name="account" size={28} color="#8C9199" />
-          </View>
-          <View style={styles.personInfo}>
-            <Text style={styles.personName}>Rahul</Text>
-            <Text style={styles.personMeta}>Nearby · Shared voluntarily</Text>
-          </View>
-        </View>
+        
 
         <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>Request Summary</Text>
           <View style={styles.summaryRow}>
-            <Icon name="wrench" size={18} color="#5A6F7D" />
-            <Text style={styles.summaryText}>Need a wrench to loosen a stuck bolt</Text>
+            <Icon name="wrench" size={20} color="#5A6F7D" />
+            <Text style={styles.summaryText}>Tool to loosen a stuck bolt</Text>
           </View>
+          <View style={styles.rowDivider} />
           <View style={styles.summaryRow}>
-            <Icon name="clock-outline" size={18} color="#5A6F7D" />
-            <Text style={styles.summaryText}>About 15 minutes</Text>
+            <Icon name="clock-outline" size={20} color="#5A6F7D" />
+            <Text style={styles.summaryText}>Approx. 15 minutes</Text>
           </View>
+          <View style={styles.rowDivider} />
           <View style={styles.summaryRow}>
-            <Icon name="map-marker" size={18} color="#5A6F7D" />
-            <Text style={styles.summaryText}>Exact spot shown after you continue</Text>
+            <Icon name="map-marker" size={20} color="#5A6F7D" />
+            <Text style={styles.summaryText}>Nearby · exact location shown after acceptance</Text>
           </View>
         </View>
 
-        <View style={styles.badgeList}>
-          <View style={[styles.badgePill, { backgroundColor: '#E6F5EA', borderColor: '#CBE9D5' }]}>
-            <Icon name="check-circle" size={18} color="#3DA365" />
-            <Text style={styles.badgeText}>Usually closes requests properly</Text>
-          </View>
-          <View style={[styles.badgePill, { backgroundColor: '#E6F3F5', borderColor: '#CBE5EA' }]}>
-            <Icon name="check-circle" size={18} color="#3D9FA3" />
-            <Text style={styles.badgeText}>Returns borrowed items on time</Text>
-          </View>
-          <View style={[styles.badgePill, { backgroundColor: '#E7EFFC', borderColor: '#CCDBF6' }]}>
-            <Icon name="check-circle" size={18} color="#5477C8" />
-            <Text style={styles.badgeText}>Also helps others when available</Text>
+        <View style={styles.sectionDivider} />
+        <Text style={styles.sectionHeading}>Community Trust Signals</Text>
+        <View style={styles.trustCard}>
+          <View style={styles.trustIconsRow}>
+            <View style={[styles.trustIconCircle, { backgroundColor: '#EAF7EF' }]}>
+              <Icon name="handshake-outline" size={40} color="#3DA365" />
+            </View>
+            <View style={[styles.trustIconCircle, { backgroundColor: '#F1F5F9' }]}>
+              <Icon name="clock-outline" size={40} color="#5A6F7D" />
+            </View>
+            <View style={[styles.trustIconCircle, { backgroundColor: '#EEF3F6' }]}>
+              <Icon name="account-group" size={40} color="#4A6FA5" />
+            </View>
+            <View style={[styles.trustIconCircle, { backgroundColor: '#FFF4E6' }]}>
+              <Icon name="calendar-check" size={40} color="#C94D4D" />
+            </View>
           </View>
         </View>
-
-        <View style={styles.noteWrap}>
-          <Text style={styles.noteText}>These are based on past local interactions — not ratings.</Text>
+        <View style={styles.infoRow}>
+          <Icon name="information" size={18} color="#999999" />
+          <Text style={styles.infoText}>These signals reflect past local interactions — not ratings or scores.</Text>
         </View>
 
-        <Button title="View Location & Details" onPress={handleOpenDetails} variant="gradient" size="large" fullWidth />
+        <Button title="Open Details" onPress={handleOpenDetails} variant="gradient" size="large" fullWidth />
         <Button title="Not Available" onPress={handleNotAvailable} variant="white" size="large" fullWidth />
       </ScrollView>
     </SafeAreaView>
@@ -93,62 +90,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 12,
   },
-  personCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E8EAED',
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    marginBottom: 12,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#EEF3F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  personInfo: {
-    flex: 1,
-  },
-  personName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#2C3E50',
-  },
-  personMeta: {
-    fontSize: 13,
-    color: '#666666',
-  },
+  
   summaryCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E8EAED',
-    paddingHorizontal: 14,
+    borderWidth: 0,
+    paddingHorizontal: 16,
     paddingVertical: 12,
     marginBottom: 12,
-    shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.06,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  summaryTitle: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#2C3E50',
-    marginBottom: 8,
+    shadowColor: '#8B3A36',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.20,
+    shadowRadius: 10,
+    elevation: 6,
   },
   summaryRow: {
     flexDirection: 'row',
@@ -156,32 +110,60 @@ const styles = StyleSheet.create({
     gap: 10,
     marginBottom: 10,
   },
+  rowDivider: {
+    height: 1,
+    backgroundColor: '#E5E7EB',
+    marginVertical: 6,
+  },
   summaryText: {
     flex: 1,
     fontSize: 14,
     color: '#2C3E50',
   },
-  badgeList: {
-    gap: 10,
-    marginBottom: 14,
+  sectionDivider: {
+    height: 1,
+    backgroundColor: '#E8EAED',
+    marginVertical: 12,
   },
-  badgePill: {
+  sectionHeading: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#2C3E50',
+    marginBottom: 8,
+  },
+  trustCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    borderWidth: 0,
+    paddingHorizontal: 16,
+    paddingVertical: 20,
+    marginBottom: 12,
+    shadowColor: '#8B3A36',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.20,
+    shadowRadius: 10,
+    elevation: 6,
+  },
+  trustIconsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  trustIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  infoRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 20,
-    borderWidth: 1,
-  },
-  badgeText: {
-    fontSize: 14,
-    color: '#2C3E50',
-  },
-  noteWrap: {
     marginBottom: 12,
   },
-  noteText: {
+  infoText: {
+    flex: 1,
     fontSize: 12,
     color: '#666666',
   },
