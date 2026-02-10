@@ -1,5 +1,7 @@
 import React from 'react';
 import { Shield, AlertTriangle, CheckSquare, Lock, FileText } from 'lucide-react';
+import { motion } from 'framer-motion';
+import Card from '../components/common/Card';
 
 const RiskTiersPage = () => {
   return (
@@ -11,7 +13,7 @@ const RiskTiersPage = () => {
       </div>
 
       {/* What Risk Tiers Are */}
-      <div className="mb-8 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 rounded-lg p-6">
+      <Card className="mb-8 p-6 bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">What Risk Tiers Are</h2>
         <div className="bg-gray-100 dark:bg-gray-700/50 rounded border border-gray-200 dark:border-gray-600 p-4">
           <p className="text-gray-700 dark:text-gray-300 font-medium mb-2">Risk tiers classify scenarios by potential for harm, misuse, or escalation.</p>
@@ -22,12 +24,12 @@ const RiskTiersPage = () => {
             <li>Admins <span className="font-semibold">cannot modify tier logic per incident</span></li>
           </ul>
         </div>
-      </div>
+      </Card>
 
       {/* Risk Tier Comparison Table */}
       <div className="mb-8">
         <h2 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Risk Tier Comparison Table</h2>
-        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+        <Card className="overflow-x-auto p-0">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead>
               <tr>
@@ -153,13 +155,13 @@ const RiskTiersPage = () => {
               </tr>
             </tbody>
           </table>
-        </div>
+        </Card>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Non-Negotiable Safeguards */}
         <div className="lg:col-span-1">
-          <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm h-full">
+          <Card className="h-full p-0 overflow-hidden">
             <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700 flex items-center gap-2">
               <Shield className="w-5 h-5 text-gray-700 dark:text-gray-300" />
               <h3 className="font-semibold text-gray-900 dark:text-white">Non-Negotiable Safeguards</h3>
@@ -185,13 +187,13 @@ const RiskTiersPage = () => {
                 <p className="text-sm text-gray-500 italic">These safeguards apply to all risk tiers.</p>
               </div>
             </div>
-          </div>
+          </Card>
         </div>
 
         {/* Legal Framing & Change Control */}
         <div className="lg:col-span-2 space-y-6">
           {/* Legal Framing */}
-          <div className="bg-gray-50 dark:bg-gray-800/30 rounded-lg p-6 border border-gray-200 dark:border-gray-700">
+          <Card className="bg-gray-50 dark:bg-gray-800/30 p-6 border border-gray-200 dark:border-gray-700">
             <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Legal Framing</h3>
             <p className="text-sm text-gray-700 dark:text-gray-300 mb-2">
               Risk tiers exist to limit information sharing and reduce harm.
@@ -199,10 +201,15 @@ const RiskTiersPage = () => {
             <p className="text-sm text-gray-700 dark:text-gray-300">
               Socius does not provide emergency response, security services, or enforcement functions.
             </p>
-          </div>
+          </Card>
 
           {/* Change Control Notice */}
-          <div className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-4 flex gap-4">
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.3 }}
+            className="bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 rounded-lg p-4 flex gap-4"
+          >
             <AlertTriangle className="w-6 h-6 text-red-700 dark:text-red-400 flex-shrink-0" />
             <div>
               <h3 className="font-bold text-red-800 dark:text-red-300 mb-1">Change Control Notice</h3>
@@ -213,7 +220,7 @@ const RiskTiersPage = () => {
                 Changes require <span className="font-semibold text-red-700 dark:text-red-300">legal review and versioned approval.</span>
               </p>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 

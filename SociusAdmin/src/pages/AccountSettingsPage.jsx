@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useAlert } from '../hooks/useAlert';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 import { 
   User, 
   Lock, 
@@ -18,6 +22,8 @@ const AccountSettingsPage = () => {
     confirmPassword: ''
   });
 
+  const { confirm, toast } = useAlert();
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -26,10 +32,21 @@ const AccountSettingsPage = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, this would call an API
-    alert('Settings updated successfully!');
+    
+    const isConfirmed = await confirm({
+      title: 'Update Settings?',
+      text: "Are you sure you want to update your account settings?",
+      icon: 'question',
+      confirmButtonText: 'Yes, update settings',
+      confirmButtonColor: '#e11d48',
+    });
+
+    if (isConfirmed) {
+      // In a real app, this would call an API
+      toast.success('Settings updated successfully!');
+    }
   };
 
   return (
@@ -45,7 +62,12 @@ const AccountSettingsPage = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         
         {/* Profile Information */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+        <Card className="overflow-hidden p-0">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex items-center gap-2">
             <User className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Profile Information</h2>
@@ -102,10 +124,16 @@ const AccountSettingsPage = () => {
               <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">Email address cannot be changed. Contact support for assistance.</p>
             </div>
           </div>
-        </div>
+        </Card>
+        </motion.div>
 
         {/* Security Settings */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+        <Card className="overflow-hidden p-0">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 flex items-center gap-2">
             <Shield className="w-5 h-5 text-gray-500 dark:text-gray-400" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Security Settings</h2>
@@ -172,24 +200,30 @@ const AccountSettingsPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
+        </motion.div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-4 pt-4">
-          <button
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="flex items-center justify-end gap-4 pt-4"
+        >
+          <Button
             type="button"
-            className="px-4 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-socius-red transition-colors"
+            variant="secondary"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
-            className="flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-socius-red hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-socius-red transition-colors"
+            className="flex items-center"
           >
             <Save className="w-4 h-4 mr-2" />
             Save Changes
-          </button>
-        </div>
+          </Button>
+        </motion.div>
 
       </form>
     </div>

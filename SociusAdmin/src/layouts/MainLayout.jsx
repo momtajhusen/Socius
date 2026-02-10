@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import { 
   User, 
   LogOut, 
@@ -169,20 +170,31 @@ const MainLayout = () => {
       </div>
 
       {/* Mobile Sidebar (Overlay) */}
+      <AnimatePresence>
       {isMobileMenuOpen && (
         <div className="fixed inset-0 z-40 flex md:hidden">
           {/* Overlay backdrop */}
-          <div 
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             className="fixed inset-0 bg-gray-600 bg-opacity-75 transition-opacity" 
             onClick={closeMobileMenu}
-          ></div>
+          ></motion.div>
           
           {/* Sidebar panel */}
-          <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800 transition ease-in-out duration-300 transform translate-x-0">
+          <motion.div 
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800"
+          >
             <SidebarContent />
-          </div>
+          </motion.div>
         </div>
       )}
+      </AnimatePresence>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 md:ml-64">
@@ -232,8 +244,13 @@ const MainLayout = () => {
               </div>
 
               {/* Dropdown menu */}
+              <AnimatePresence>
               {isUserMenuOpen && (
-                <div
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: -10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: -10 }}
+                  transition={{ duration: 0.15 }}
                   className="origin-top-right absolute right-0 mt-2 w-56 rounded-lg shadow-xl bg-white dark:bg-gray-800 ring-1 ring-black ring-opacity-5 focus:outline-none z-50 overflow-hidden divide-y divide-gray-100 dark:divide-gray-700"
                   role="menu"
                   aria-orientation="vertical"
@@ -277,15 +294,27 @@ const MainLayout = () => {
                       Sign out
                     </button>
                   </div>
-                </div>
+                </motion.div>
               )}
+              </AnimatePresence>
             </div>
           </div>
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 relative bg-white dark:bg-gray-900">
-          <Outlet />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 relative bg-white dark:bg-gray-900 overflow-hidden">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
+              className="h-full"
+            >
+              <Outlet />
+            </motion.div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

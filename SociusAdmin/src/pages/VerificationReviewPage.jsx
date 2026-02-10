@@ -7,11 +7,17 @@ import {
   User,
   CreditCard
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useAlert } from '../hooks/useAlert';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 
 const VerificationReviewPage = () => {
   const { requestId } = useParams();
   const navigate = useNavigate();
+  const { confirm, toast } = useAlert();
   const [rejectReason, setRejectReason] = useState('');
+  const [processingAction, setProcessingAction] = useState(null);
 
   // Mock Data matching the screenshot
   const data = {
@@ -21,6 +27,71 @@ const VerificationReviewPage = () => {
     name: 'Ahmed Khan',
     age: '27',
     association: 'Crescent Community Center'
+  };
+
+  const handleApprove = async () => {
+    const result = await confirm({
+      title: 'Approve Verification?',
+      text: "This will verify the user's identity and grant full access.",
+      icon: 'question',
+      confirmButtonText: 'Yes, approve',
+      confirmButtonColor: 'bg-green-700 hover:bg-green-800 text-white',
+    });
+    
+    if (result.isConfirmed) {
+      setProcessingAction('approve');
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setProcessingAction(null);
+      
+      toast.success('Verification approved successfully');
+      navigate('/verification');
+    }
+  };
+
+  const handleReject = async () => {
+    if (!rejectReason) {
+      toast.error('Please select a rejection reason');
+      return;
+    }
+    
+    const result = await confirm({
+      title: 'Reject Verification?',
+      text: "User will be notified of the rejection reason.",
+      icon: 'error',
+      confirmButtonText: 'Yes, reject',
+      confirmButtonColor: 'bg-red-700 hover:bg-red-800 text-white',
+    });
+    
+    if (result.isConfirmed) {
+      setProcessingAction('reject');
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setProcessingAction(null);
+      
+      toast.success('Verification rejected');
+      navigate('/verification');
+    }
+  };
+
+  const handleResubmit = async () => {
+    const result = await confirm({
+      title: 'Request Resubmission?',
+      text: "User will be asked to upload new documents.",
+      icon: 'warning',
+      confirmButtonText: 'Yes, request resubmission',
+      confirmButtonColor: 'bg-amber-600 hover:bg-amber-700 text-white',
+    });
+    
+    if (result.isConfirmed) {
+      setProcessingAction('resubmit');
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setProcessingAction(null);
+      
+      toast.success('Resubmission requested');
+      navigate('/verification');
+    }
   };
 
   return (
@@ -41,7 +112,8 @@ const VerificationReviewPage = () => {
             </h2>
 
             {/* Account Details */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <Card className="overflow-hidden p-0">
               <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Account Details</h3>
               </div>
@@ -59,10 +131,12 @@ const VerificationReviewPage = () => {
                   <span className="col-span-2 text-sm font-bold text-gray-900 dark:text-white">{data.submittedOn}</span>
                 </div>
               </div>
-            </div>
+            </Card>
+            </motion.div>
 
             {/* Declared Basic Info */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <Card className="overflow-hidden p-0">
               <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Declared Basic Info</h3>
               </div>
@@ -80,7 +154,8 @@ const VerificationReviewPage = () => {
                   <span className="col-span-2 text-sm font-bold text-gray-900 dark:text-white">{data.association}</span>
                 </div>
               </div>
-            </div>
+            </Card>
+            </motion.div>
           </div>
 
           {/* Right Column: Verification Materials */}
@@ -90,7 +165,8 @@ const VerificationReviewPage = () => {
             </h2>
 
             {/* Government-issued ID */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+            <Card className="overflow-hidden p-0">
               <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Government-issued ID</h3>
               </div>
@@ -105,20 +181,22 @@ const VerificationReviewPage = () => {
                 </div>
                 
                 <div className="flex space-x-6">
-                  <button className="flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                  <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 p-0 h-auto">
                     <Maximize2 size={16} className="mr-1.5" />
                     <span className="underline">View full size</span>
-                  </button>
-                  <button className="flex items-center text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                  </Button>
+                  <Button variant="ghost" size="sm" className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 p-0 h-auto">
                     <ZoomIn size={16} className="mr-1.5" />
                     <span className="underline">Zoom</span>
-                  </button>
+                  </Button>
                 </div>
               </div>
-            </div>
+            </Card>
+            </motion.div>
 
             {/* Selfie Verification */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
+            <Card className="overflow-hidden p-0">
               <div className="px-4 py-3 bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700">
                 <h3 className="font-semibold text-gray-900 dark:text-white text-sm">Selfie Verification</h3>
               </div>
@@ -135,13 +213,18 @@ const VerificationReviewPage = () => {
                   Selfie is used only to confirm document ownership.
                 </p>
               </div>
-            </div>
-
+            </Card>
+            </motion.div>
           </div>
         </div>
 
       {/* Action Footer */}
-      <div className="fixed bottom-0 left-0 right-0 lg:left-64 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 shadow-lg z-10">
+      <motion.div 
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.5, type: "spring", stiffness: 120, damping: 20 }}
+        className="fixed bottom-0 left-0 right-0 lg:left-64 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 shadow-lg z-10"
+      >
         <div className="max-w-7xl mx-auto">
           <p className="text-sm text-gray-500 dark:text-gray-400 mb-4 text-center sm:text-left">
             Approval confirms identity submission completeness only.
@@ -149,19 +232,32 @@ const VerificationReviewPage = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
-              <button className="px-6 py-2 bg-green-700 hover:bg-green-800 text-white font-semibold rounded shadow-sm transition-colors w-full sm:w-auto">
+              <Button 
+                variant="primary"
+                onClick={handleApprove}
+                loading={processingAction === 'approve'}
+                disabled={processingAction !== null}
+                className="w-full sm:w-auto bg-green-700 hover:bg-green-800 border-transparent focus:ring-green-500"
+              >
                 Approve Verification
-              </button>
+              </Button>
               
               <div className="flex w-full sm:w-auto">
-                <button className="px-4 py-2 border border-red-200 text-red-800 font-semibold bg-red-50 hover:bg-red-100 rounded-l transition-colors whitespace-nowrap">
+                <Button 
+                  variant="outline"
+                  onClick={handleReject}
+                  loading={processingAction === 'reject'}
+                  disabled={processingAction !== null}
+                  className="rounded-r-none border-red-200 text-red-800 bg-red-50 hover:bg-red-100 hover:border-red-300 w-auto"
+                >
                   Reject Verification
-                </button>
+                </Button>
                 <div className="relative border-t border-b border-r border-red-200 rounded-r bg-white hover:bg-gray-50 transition-colors">
                   <select 
-                    className="appearance-none bg-transparent pl-3 pr-8 py-2 h-full text-sm text-gray-700 focus:outline-none cursor-pointer"
+                    className="appearance-none bg-transparent pl-3 pr-8 py-2 h-full text-sm text-gray-700 focus:outline-none cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
+                    disabled={processingAction !== null}
                   >
                     <option value="">Select Reason</option>
                     <option value="blurry">Image Blurry</option>
@@ -172,9 +268,15 @@ const VerificationReviewPage = () => {
                 </div>
               </div>
 
-              <button className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded shadow-sm transition-colors w-full sm:w-auto">
+              <Button 
+                variant="secondary"
+                onClick={handleResubmit}
+                loading={processingAction === 'resubmit'}
+                disabled={processingAction !== null}
+                className="w-full sm:w-auto bg-gray-200 hover:bg-gray-300 text-gray-800 border-transparent"
+              >
                 Request Resubmission
-              </button>
+              </Button>
             </div>
           </div>
           
@@ -182,7 +284,7 @@ const VerificationReviewPage = () => {
             Verification actions are logged and auditable. Documents are stored securely and access is limited.
           </p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 };

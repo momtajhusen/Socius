@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useAlert } from '../hooks/useAlert';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 import { 
   ChevronDown, 
   Search, 
@@ -13,7 +17,16 @@ import {
 } from 'lucide-react';
 
 const IncidentReviewPage = () => {
+  const { toast } = useAlert();
   const [selectedIncident, setSelectedIncident] = useState(10123);
+  const [processingAction, setProcessingAction] = useState(null);
+
+  const handleAction = async (action, message) => {
+    setProcessingAction(action);
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setProcessingAction(null);
+    toast.success(message);
+  };
 
   // Mock Data
   const incidents = [
@@ -44,7 +57,7 @@ const IncidentReviewPage = () => {
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 mb-6 flex flex-wrap gap-3 items-center">
+      <Card className="p-4 mb-6 flex flex-wrap gap-3 items-center">
         <div className="relative w-full md:w-auto">
           <select className="appearance-none bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-md focus:ring-socius-red focus:border-socius-red block w-full pl-3 pr-8 py-2">
             <option>Date Range</option>
@@ -81,23 +94,35 @@ const IncidentReviewPage = () => {
         </div>
 
         <div className="flex w-full md:w-auto gap-2 ml-auto sm:ml-0">
-            <button className="flex-1 md:flex-none px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
-            Export
-            </button>
-            <button className="flex-1 md:flex-none px-4 py-2 bg-socius-red text-white rounded-md text-sm font-medium hover:bg-red-800">
-            Apply Filters
-            </button>
+            <Button 
+              variant="secondary" 
+              className="flex-1 md:flex-none px-4 py-2 text-sm shadow-sm"
+              onClick={() => handleAction('export_top', 'Exporting incident report...')}
+              loading={processingAction === 'export_top'}
+              disabled={!!processingAction}
+            >
+            {processingAction === 'export_top' ? 'Exporting...' : 'Export'}
+            </Button>
+            <Button 
+              variant="primary" 
+              className="flex-1 md:flex-none px-4 py-2 text-sm shadow-sm"
+              onClick={() => handleAction('apply_filters', 'Filters applied')}
+              loading={processingAction === 'apply_filters'}
+              disabled={!!processingAction}
+            >
+            {processingAction === 'apply_filters' ? 'Applying...' : 'Apply Filters'}
+            </Button>
         </div>
-        <button className="w-full md:w-auto text-sm text-socius-red font-medium hover:text-red-800 text-center md:text-left">
+        <button className="w-full md:w-auto text-sm text-socius-red font-medium hover:text-red-800 text-center md:text-left transition-colors">
           Reset
         </button>
-      </div>
+      </Card>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left Column: Incident List */}
-        <div className="lg:col-span-8 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <Card className="lg:col-span-8 overflow-hidden p-0">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">Incident List</h3>
           </div>
@@ -149,11 +174,11 @@ const IncidentReviewPage = () => {
               </tbody>
             </table>
           </div>
-        </div>
+        </Card>
 
         {/* Right Column: Incident Summary */}
-        <div className="lg:col-span-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col">
-          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
+        <Card className="lg:col-span-4 flex flex-col p-0">
+          <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 rounded-t-xl">
             <h3 className="text-lg font-medium text-gray-900 dark:text-white">Incident Summary</h3>
           </div>
           
@@ -180,22 +205,23 @@ const IncidentReviewPage = () => {
             <div>
               <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Timeline</h4>
               <div className="relative pl-4 border-l-2 border-gray-200 dark:border-gray-700 space-y-4">
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-1.5 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600"></div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Awareness request created</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-1.5 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600"></div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">12 volunteers became aware</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-1.5 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600"></div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Navigation opened (6)</p>
-                </div>
-                <div className="relative">
-                  <div className="absolute -left-[21px] top-1.5 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600"></div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Incident closed</p>
-                </div>
+                {[
+                  "Awareness request created",
+                  "12 volunteers became aware",
+                  "Navigation opened (6)",
+                  "Incident closed"
+                ].map((event, index) => (
+                  <motion.div 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.1 }}
+                    key={index} 
+                    className="relative"
+                  >
+                    <div className="absolute -left-[21px] top-1.5 h-3 w-3 rounded-full bg-gray-300 dark:bg-gray-600"></div>
+                    <p className="text-sm text-gray-600 dark:text-gray-400">{event}</p>
+                  </motion.div>
+                ))}
               </div>
             </div>
 
@@ -216,23 +242,27 @@ const IncidentReviewPage = () => {
             <div>
               <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-3">Feedback Signals</h4>
               <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                <div className="flex items-center">
-                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></div>
-                  <span>User Feedback: 12</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></div>
-                  <span>Volunteer Feedback: 8</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-1.5 h-1.5 bg-gray-400 rounded-full mr-2"></div>
-                  <span>Flags Raised: 0</span>
-                </div>
+                {[
+                  { label: "User Feedback: 12", color: "bg-gray-400" },
+                  { label: "Volunteer Feedback: 8", color: "bg-gray-400" },
+                  { label: "Flags Raised: 0", color: "bg-gray-400" }
+                ].map((signal, index) => (
+                  <motion.div 
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 + (index * 0.1) }}
+                    key={index} 
+                    className="flex items-center"
+                  >
+                    <div className={`w-1.5 h-1.5 rounded-full mr-2 ${signal.color}`}></div>
+                    <span>{signal.label}</span>
+                  </motion.div>
+                ))}
               </div>
             </div>
 
           </div>
-        </div>
+        </Card>
       </div>
 
       {/* Footer Actions */}
@@ -241,15 +271,32 @@ const IncidentReviewPage = () => {
           Incident reviews are anonymized and used only for learning, safety, and platform improvement.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
-          <button className="px-4 py-2 bg-socius-red text-white text-sm font-medium rounded hover:bg-red-800">
+          <Button 
+            variant="primary" 
+            className="px-4 py-2 text-sm font-medium shadow-sm"
+            onClick={() => handleAction('policy_review', 'Marked for policy review')}
+            loading={processingAction === 'policy_review'}
+            disabled={!!processingAction}
+          >
             Mark for Policy Review
-          </button>
-          <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700">
+          </Button>
+          <Button 
+            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 border-transparent text-white text-sm font-medium shadow-sm"
+            onClick={() => handleAction('content_team', 'Sent to content team')}
+            loading={processingAction === 'content_team'}
+            disabled={!!processingAction}
+          >
             Send to Content Team
-          </button>
-          <button className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded hover:bg-gray-50 dark:hover:bg-gray-600">
+          </Button>
+          <Button 
+            variant="secondary" 
+            className="px-4 py-2 text-sm font-medium shadow-sm"
+            onClick={() => handleAction('export_report', 'Anonymized report exported')}
+            loading={processingAction === 'export_report'}
+            disabled={!!processingAction}
+          >
             Export Anonymized Report
-          </button>
+          </Button>
         </div>
       </div>
     </div>

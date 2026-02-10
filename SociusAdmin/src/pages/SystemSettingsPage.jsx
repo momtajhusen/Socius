@@ -1,28 +1,57 @@
 import React from 'react';
 import { 
   Lock, 
-  Shield, 
   AlertTriangle,
-  Clock,
-  Settings,
-  AlertOctagon,
-  FileText,
-  Database
 } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { useAlert } from '../hooks/useAlert';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 
 const SystemSettingsPage = () => {
+  const { confirm, toast } = useAlert();
+
+  const handleSaveChanges = async () => {
+    const isConfirmed = await confirm({
+      title: 'Save System Changes?',
+      text: "You are about to modify platform-wide safety settings.",
+      icon: 'warning',
+      confirmButtonText: 'Yes, save changes',
+      confirmButtonColor: '#3085d6',
+    });
+
+    if (isConfirmed) {
+      toast.success('System settings updated successfully');
+    }
+  };
+
   return (
-    <div className="flex flex-col min-h-screen pb-10">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="flex flex-col min-h-screen pb-10"
+    >
       {/* Header */}
-      <div className="mb-6">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-6"
+      >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">System Settings & Safeguards</h1>
         <p className="mt-1 text-gray-500 dark:text-gray-400">Platform-wide limits, safety rules, and non-negotiable boundaries</p>
-      </div>
+      </motion.div>
 
       <div className="space-y-6">
         
         {/* Platform Boundaries */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+        <Card className="overflow-hidden p-0">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-2">
             <Lock className="w-5 h-5 text-gray-500" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Platform Boundaries</h2>
@@ -37,7 +66,13 @@ const SystemSettingsPage = () => {
                 "No live tracking of users",
                 "No public incident feeds"
               ].map((boundary, index) => (
-                <div key={index} className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0">
+                <motion.div 
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  key={index} 
+                  className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                >
                   <div className="flex items-center gap-2">
                     <Lock className="w-4 h-4 text-socius-red" />
                     <span className="text-sm font-medium text-gray-900 dark:text-white">{boundary}</span>
@@ -46,14 +81,20 @@ const SystemSettingsPage = () => {
                     <Lock className="w-3 h-3" />
                     <span>This setting cannot be changed</span>
                   </div>
-                </div>
+                </motion.div>
               ))}
             </div>
           </div>
-        </div>
+        </Card>
+        </motion.div>
 
         {/* Incident Safety Limits */}
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+        <Card className="overflow-hidden p-0">
           <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-2">
             <Lock className="w-5 h-5 text-gray-500" />
             <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Incident Safety Limits</h2>
@@ -107,11 +148,17 @@ const SystemSettingsPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Notification Safeguards */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+          <Card className="overflow-hidden p-0">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-2">
               <Lock className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Notification Safeguards</h2>
@@ -129,10 +176,16 @@ const SystemSettingsPage = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
+          </motion.div>
 
           {/* Police Escalation Constraints */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.4 }}
+          >
+          <Card className="overflow-hidden p-0">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-2">
               <Lock className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Police Escalation Constraints</h2>
@@ -153,12 +206,18 @@ const SystemSettingsPage = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
+          </motion.div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Content Safety Controls */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+          <Card className="overflow-hidden p-0">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-2">
               <Lock className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Content Safety Controls</h2>
@@ -187,10 +246,16 @@ const SystemSettingsPage = () => {
                 <span className="text-xs text-gray-500 italic">View-only - Language controls prevent misinterpretation</span>
               </div>
             </div>
-          </div>
+          </Card>
+          </motion.div>
 
           {/* Emergency Fail-Safes */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.5 }}
+          >
+          <Card className="overflow-hidden p-0">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-2">
               <Lock className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Emergency Fail-Safes</h2>
@@ -211,12 +276,18 @@ const SystemSettingsPage = () => {
                 <span className="text-xs text-gray-500 italic">Caps enforced by system</span>
               </div>
             </div>
-          </div>
+          </Card>
+          </motion.div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Data & Logging Safeguards */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
+          <Card className="overflow-hidden p-0">
             <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800 flex items-center gap-2">
               <Lock className="w-5 h-5 text-gray-500" />
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Data & Logging Safeguards</h2>
@@ -233,13 +304,19 @@ const SystemSettingsPage = () => {
                 </div>
               ))}
             </div>
-          </div>
+          </Card>
+          </motion.div>
         </div>
 
       </div>
 
       {/* Footer Actions */}
-      <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 dark:border-gray-700 pt-6">
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.7 }}
+        className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-gray-200 dark:border-gray-700 pt-6"
+      >
         <p className="text-xs text-gray-500 dark:text-gray-400">
           These safeguards ensure Socius remains an information-sharing and awareness platform, not an enforcement or response system.
           <span className="ml-2 inline-flex gap-2">
@@ -249,15 +326,15 @@ const SystemSettingsPage = () => {
           </span>
         </p>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded hover:bg-blue-700 shadow-sm">
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white shadow-sm" onClick={handleSaveChanges}>
             Save Changes
-          </button>
-          <button className="px-4 py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded hover:bg-gray-50 dark:hover:bg-gray-600 shadow-sm">
+          </Button>
+          <Button variant="secondary" className="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600 shadow-sm">
             View Change Log
-          </button>
+          </Button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

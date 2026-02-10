@@ -1,6 +1,8 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
+import { useTheme } from './context/ThemeContext';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import AuthLayout from './layouts/AuthLayout';
 import MainLayout from './layouts/MainLayout';
@@ -26,9 +28,34 @@ import ScenarioConfigPage from './pages/ScenarioConfigPage';
 import AccountSettingsPage from './pages/AccountSettingsPage';
 
 function App() {
+  const { theme } = useTheme();
+
   return (
     <BrowserRouter>
       <AuthProvider>
+        <Toaster 
+          position="top-right" 
+          reverseOrder={false}
+          toastOptions={{
+            style: {
+              background: theme === 'dark' ? '#1f2937' : '#ffffff',
+              color: theme === 'dark' ? '#f3f4f6' : '#111827',
+              border: theme === 'dark' ? '1px solid #374151' : '1px solid #e5e7eb',
+            },
+            success: {
+              iconTheme: {
+                primary: '#16a34a',
+                secondary: '#ffffff',
+              },
+            },
+            error: {
+              iconTheme: {
+                primary: '#dc2626',
+                secondary: '#ffffff',
+              },
+            },
+          }}
+        />
         <Routes>
           {/* Public Routes */}
           <Route element={<AuthLayout />}>

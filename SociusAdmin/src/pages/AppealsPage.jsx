@@ -1,4 +1,7 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 import { 
   Filter, 
   ChevronDown, 
@@ -11,8 +14,12 @@ import {
   Shield, 
   Image as ImageIcon 
 } from 'lucide-react';
+import { useAlert } from '../hooks/useAlert';
 
 const AppealsPage = () => {
+  const { confirm, toast } = useAlert();
+  const [decision, setDecision] = useState('Reinstate account');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedAppeal, setSelectedAppeal] = useState({
     id: 'APL-23107',
     accountType: 'User',
@@ -96,6 +103,43 @@ const AppealsPage = () => {
     }
   ];
 
+  const handleSubmitDecision = async () => {
+    let title = 'Submit Decision?';
+    let text = "This action will be logged and notified to the user.";
+    let icon = 'question';
+    let confirmColor = 'bg-blue-600 hover:bg-blue-700 text-white';
+
+    if (decision === 'Deny appeal (Keep suspended)') {
+      title = 'Deny Appeal?';
+      text = "The account will remain suspended. The user will be notified.";
+      icon = 'warning';
+      confirmColor = 'bg-red-600 hover:bg-red-700 text-white';
+    } else if (decision === 'Reinstate account') {
+      title = 'Reinstate Account?';
+      text = "Access will be restored immediately.";
+      icon = 'success';
+      confirmColor = 'bg-green-700 hover:bg-green-800 text-white';
+    }
+
+    const result = await confirm({
+      title: title,
+      text: text,
+      icon: icon,
+      confirmButtonText: 'Yes, submit decision',
+      confirmButtonColor: confirmColor,
+    });
+    
+    if (result.isConfirmed) {
+      setIsSubmitting(true);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      toast.success('Decision submitted successfully');
+      setIsSubmitting(false);
+      // Logic to update status would go here
+    }
+  };
+
   const getStatusBadge = (status) => {
     switch (status) {
       case 'Pending':
@@ -110,18 +154,34 @@ const AppealsPage = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-gray-700 pb-4">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="border-b border-gray-200 dark:border-gray-700 pb-4"
+      >
         <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Appeals & Re-verification Review</h1>
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
           Review requests for account reconsideration and verification re-checks.
         </p>
-      </div>
+      </motion.div>
 
       <div className="flex flex-col lg:grid lg:grid-cols-5 gap-6 h-auto lg:h-[calc(100vh-180px)] min-h-[600px]">
         {/* Left Panel: Appeals List */}
-        <div className="lg:col-span-3 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 flex flex-col overflow-hidden h-[500px] lg:h-auto">
+        <motion.div 
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.2 }}
+          className="lg:col-span-3 h-full"
+        >
+        <Card className="flex flex-col overflow-hidden h-[500px] lg:h-full p-0">
           {/* Toolbar */}
           <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between bg-gray-50 dark:bg-gray-800">
             <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
@@ -143,14 +203,18 @@ const AppealsPage = () => {
 
           {/* List Items */}
           <div className="flex-1 overflow-y-auto">
-            {appeals.map((appeal) => (
-              <div 
+            {appeals.map((appeal, index) => (
+              <motion.div 
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 + index * 0.05 }}
+                whileHover={{ backgroundColor: "rgba(59, 130, 246, 0.05)" }}
                 key={appeal.id}
                 onClick={() => setSelectedAppeal(appeal)}
                 className={`flex flex-col gap-2 p-4 md:grid md:grid-cols-12 md:gap-4 md:px-4 md:py-4 text-sm border-b border-gray-100 dark:border-gray-700 cursor-pointer transition-colors ${
                   selectedAppeal?.id === appeal.id 
                     ? 'bg-gray-50 dark:bg-blue-900/10' 
-                    : 'bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700'
+                    : 'bg-white dark:bg-gray-800'
                 }`}
               >
                 {/* Mobile Top Row: ID & Status */}
@@ -179,7 +243,7 @@ const AppealsPage = () => {
                   <span className="md:hidden">Submitted: {appeal.submitted}</span>
                   <span className="hidden md:inline">{appeal.submitted}</span>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
 
@@ -204,7 +268,8 @@ const AppealsPage = () => {
                 </ul>
              </div>
           </div>
-        </div>
+        </Card>
+        </motion.div>
 
         {/* Right Panel: Details */}
         <div 
@@ -219,123 +284,154 @@ const AppealsPage = () => {
               }
             `}
           </style>
-          {selectedAppeal ? (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col h-full">
-              <div className="flex-1 overflow-y-auto">
-                
-                {/* Account Summary */}
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Account Summary</h3>
-                  <div className="space-y-3 text-sm">
-                    <div className="grid grid-cols-2">
-                      <span className="text-gray-500 dark:text-gray-400">Account ID:</span>
-                      <span className="font-semibold text-gray-900 dark:text-white">{selectedAppeal.accountId}</span>
-                    </div>
-                    <div className="grid grid-cols-2">
-                      <span className="text-gray-500 dark:text-gray-400">Current Status:</span>
-                      <span className="font-medium text-red-600 dark:text-red-400">{selectedAppeal.currentStatus}</span>
-                    </div>
-                    <div className="grid grid-cols-2">
-                      <span className="text-gray-500 dark:text-gray-400">Original Action:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{selectedAppeal.originalAction}</span>
-                    </div>
-                    <div className="grid grid-cols-2">
-                      <span className="text-gray-500 dark:text-gray-400">Action Date:</span>
-                      <span className="font-medium text-gray-900 dark:text-white">{selectedAppeal.actionDate}</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Appeal Submission */}
-                <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Appeal Submission</h3>
-                  <div className="space-y-3">
-                    <div>
-                      <label className="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-2">User explanation (unedited):</label>
-                      <div className="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-sm text-sm text-gray-700 dark:text-gray-200">
-                        {selectedAppeal.explanation}
+          <AnimatePresence mode="wait">
+            {selectedAppeal ? (
+              <motion.div
+                key={selectedAppeal.id}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.2 }}
+                className="h-full"
+              >
+                <Card className="flex flex-col h-full p-0 overflow-hidden">
+                  <div className="flex-1 overflow-y-auto">
+                    
+                    {/* Account Summary */}
+                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Account Summary</h3>
+                      <div className="space-y-3 text-sm">
+                        <div className="grid grid-cols-2">
+                          <span className="text-gray-500 dark:text-gray-400">Account ID:</span>
+                          <span className="font-semibold text-gray-900 dark:text-white">{selectedAppeal.accountId}</span>
+                        </div>
+                        <div className="grid grid-cols-2">
+                          <span className="text-gray-500 dark:text-gray-400">Current Status:</span>
+                          <span className="font-medium text-red-600 dark:text-red-400">{selectedAppeal.currentStatus}</span>
+                        </div>
+                        <div className="grid grid-cols-2">
+                          <span className="text-gray-500 dark:text-gray-400">Original Action:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{selectedAppeal.originalAction}</span>
+                        </div>
+                        <div className="grid grid-cols-2">
+                          <span className="text-gray-500 dark:text-gray-400">Action Date:</span>
+                          <span className="font-medium text-gray-900 dark:text-white">{selectedAppeal.actionDate}</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="text-xs text-gray-400 dark:text-gray-500">
-                      Submitted: {selectedAppeal.submitted}
-                    </div>
-                  </div>
-                </div>
 
-                {/* Verification Materials */}
-                {selectedAppeal.verificationMaterials.length > 0 && (
-                  <div className="p-6 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Verification Materials</h3>
-                    <div className="flex gap-3 overflow-x-auto pb-2">
-                      {selectedAppeal.verificationMaterials.map((item, index) => (
-                        <div key={index} className="w-24 h-20 bg-gray-100 dark:bg-gray-700 rounded-sm border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity">
-                           <ImageIcon className="w-8 h-8 text-gray-400" />
+                    {/* Appeal Submission */}
+                    <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Appeal Submission</h3>
+                      <div className="space-y-3">
+                        <div>
+                          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 block mb-2">User explanation (unedited):</label>
+                          <div className="p-4 bg-gray-100 dark:bg-gray-700/50 rounded-sm text-sm text-gray-700 dark:text-gray-200">
+                            {selectedAppeal.explanation}
+                          </div>
                         </div>
-                      ))}
+                        <div className="text-xs text-gray-400 dark:text-gray-500">
+                          Submitted: {selectedAppeal.submitted}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Verification Materials */}
+                    {selectedAppeal.verificationMaterials.length > 0 && (
+                      <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                        <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Verification Materials</h3>
+                        <div className="flex gap-3 overflow-x-auto pb-2">
+                          {selectedAppeal.verificationMaterials.map((item, index) => (
+                            <div key={index} className="w-24 h-20 bg-gray-100 dark:bg-gray-700 rounded-sm border border-gray-200 dark:border-gray-600 flex items-center justify-center flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity">
+                               <ImageIcon className="w-8 h-8 text-gray-400" />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Admin Decision */}
+                    <div className="p-6">
+                      <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Admin Decision</h3>
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-4">
+                          <label className="text-sm font-medium text-gray-700 dark:text-gray-300 w-20">Decision:</label>
+                          <select 
+                            value={decision}
+                            onChange={(e) => setDecision(e.target.value)}
+                            disabled={isSubmitting}
+                            className="block flex-1 pl-3 pr-10 py-2 text-sm border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            <option>Reinstate account</option>
+                            <option>Deny appeal (Keep suspended)</option>
+                            <option>Request more information</option>
+                          </select>
+                        </div>
+                        
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Decision Notes (Internal):</label>
+                          <textarea 
+                            rows="3"
+                            disabled={isSubmitting}
+                            className="block w-full p-3 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                            defaultValue="Reviewed per Socius policy."
+                          ></textarea>
+                        </div>
+
+                        <div className="flex items-center">
+                            <input
+                              id="policy"
+                              name="policy"
+                              type="checkbox"
+                              disabled={isSubmitting}
+                              className="focus:ring-blue-500 h-4 w-4 text-blue-900 border-gray-300 rounded disabled:opacity-50 disabled:cursor-not-allowed"
+                              defaultChecked
+                            />
+                          <label htmlFor="policy" className="ml-2 block text-sm text-gray-700 dark:text-gray-300 italic">
+                            Decision follows Socius policy & safeguards
+                          </label>
+                        </div>
+
+                        <div className="flex justify-end pt-2">
+                          <Button 
+                            className="px-6" 
+                            onClick={handleSubmitDecision}
+                            loading={isSubmitting}
+                            disabled={isSubmitting}
+                          >
+                            Submit Decision
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                )}
-
-                {/* Admin Decision */}
-                <div className="p-6">
-                  <h3 className="text-sm font-medium text-gray-900 dark:text-white mb-4">Admin Decision</h3>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <label className="text-sm font-medium text-gray-700 dark:text-gray-300 w-20">Decision:</label>
-                      <select className="block flex-1 pl-3 pr-10 py-2 text-sm border-gray-300 dark:border-gray-600 focus:outline-none focus:ring-blue-500 focus:border-blue-500 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm">
-                        <option>Reinstate account</option>
-                        <option>Deny appeal (Keep suspended)</option>
-                        <option>Request more information</option>
-                      </select>
-                    </div>
-                    
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Decision Notes (Internal):</label>
-                      <textarea 
-                        rows="3"
-                        className="block w-full p-3 text-sm border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-white shadow-sm"
-                        defaultValue="Reviewed per Socius policy."
-                      ></textarea>
-                    </div>
-
-                    <div className="flex items-center">
-                        <input
-                          id="policy"
-                          name="policy"
-                          type="checkbox"
-                          className="focus:ring-blue-500 h-4 w-4 text-blue-900 border-gray-300 rounded"
-                          defaultChecked
-                        />
-                      <label htmlFor="policy" className="ml-2 block text-sm text-gray-700 dark:text-gray-300 italic">
-                        Decision follows Socius policy & safeguards
-                      </label>
-                    </div>
-
-                    <div className="flex justify-end pt-2">
-                      <button className="px-6 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-900 hover:bg-blue-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-900">
-                        Submit Decision
-                      </button>
-                    </div>
+                  
+                  <div className="bg-white dark:bg-gray-800 px-6 py-4">
+                    <p className="text-xs text-gray-400 dark:text-gray-500 italic">
+                      Appeals are reviewed independently. Decisions are logged and auditable.
+                    </p>
                   </div>
-                </div>
-              </div>
-              
-              <div className="bg-white dark:bg-gray-800 px-6 py-4">
-                <p className="text-xs text-gray-400 dark:text-gray-500 italic">
-                  Appeals are reviewed independently. Decisions are logged and auditable.
-                </p>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-10 flex flex-col items-center justify-center h-full text-center">
-              <Shield className="w-12 h-12 text-gray-300 mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white">Select an appeal to review</h3>
-              <p className="text-gray-500 dark:text-gray-400 mt-2">Choose an item from the list to view details and make a decision.</p>
-            </div>
-          )}
+                </Card>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="h-full"
+              >
+                <Card className="p-10 flex flex-col items-center justify-center h-full text-center">
+                  <Shield className="w-12 h-12 text-gray-300 mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">Select an appeal to review</h3>
+                  <p className="text-gray-500 dark:text-gray-400 mt-2">Choose an item from the list to view details and make a decision.</p>
+                </Card>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

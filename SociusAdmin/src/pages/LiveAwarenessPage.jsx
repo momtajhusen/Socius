@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 
 // Mock Data matching the screenshot
 const initialIncidents = [
@@ -36,7 +39,15 @@ const LiveAwarenessPage = () => {
   const [timeRange, setTimeRange] = useState('Last 6h');
   const [category, setCategory] = useState('Calm Presence');
   const [status, setStatus] = useState('Open');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleFilterChange = async (setter, value) => {
+    setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    setter(value);
+    setIsLoading(false);
+  };
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -49,7 +60,7 @@ const LiveAwarenessPage = () => {
       </div>
 
       {/* Filters */}
-      <div className="flex flex-col md:flex-row flex-wrap items-start md:items-center gap-4 mb-6 bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-100 dark:border-gray-700">
+      <Card className="flex flex-col md:flex-row flex-wrap items-start md:items-center gap-4 mb-6 p-4">
         {/* Category Filter */}
         <div className="flex items-center space-x-2 w-full md:w-auto">
           <label htmlFor="category" className="text-sm font-bold text-gray-700 dark:text-gray-300">
@@ -76,8 +87,9 @@ const LiveAwarenessPage = () => {
           <select
             id="status"
             value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="block w-full md:w-32 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-socius-red focus:border-socius-red sm:text-sm rounded-md border dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            onChange={(e) => handleFilterChange(setStatus, e.target.value)}
+            disabled={isLoading}
+            className="block w-full md:w-32 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-socius-red focus:border-socius-red sm:text-sm rounded-md border dark:bg-gray-700 dark:border-gray-600 dark:text-white disabled:opacity-50"
           >
             <option>Open</option>
             <option>Frozen</option>
@@ -91,27 +103,35 @@ const LiveAwarenessPage = () => {
           <span className="text-sm font-bold text-gray-700 dark:text-gray-300 sm:mr-2">Time Range:</span>
           <div className="inline-flex rounded-md shadow-sm w-full sm:w-auto" role="group">
             {['Last 1h', 'Last 6h', 'Last 24h'].map((range, idx) => (
-              <button
+              <motion.button
+                whileTap={{ scale: 0.95 }}
+                whileHover={{ scale: 1.02 }}
                 key={range}
                 type="button"
-                onClick={() => setTimeRange(range)}
+                onClick={() => handleFilterChange(setTimeRange, range)}
+                disabled={isLoading}
                 className={`flex-1 sm:flex-none px-4 py-2 text-sm font-medium border ${
                   idx === 0 ? 'rounded-l-lg' : ''
                 } ${idx === 2 ? 'rounded-r-lg' : ''} ${
                   timeRange === range
                     ? 'z-10 bg-gray-100 text-blue-600 border-gray-200 dark:bg-gray-700 dark:text-white dark:border-gray-600'
                     : 'bg-white text-gray-700 border-gray-200 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700'
-                }`}
+                } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
               >
                 {range}
-              </button>
+              </motion.button>
             ))}
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Table */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <Card className="overflow-hidden p-0 relative">
+        {isLoading && (
+          <div className="absolute inset-0 bg-white/50 dark:bg-gray-800/50 z-10 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-50 dark:bg-gray-700/50">
@@ -140,8 +160,14 @@ const LiveAwarenessPage = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {initialIncidents.map((incident) => (
-                <tr key={incident.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+              {initialIncidents.map((incident, index) => (
+                <motion.tr 
+                  key={incident.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {incident.id}
                   </td>
@@ -169,19 +195,20 @@ const LiveAwarenessPage = () => {
                     {incident.flags === 'green' && <GreenFlagIcon />}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                    <button 
+                    <Button 
+                      variant="secondary"
                       onClick={() => navigate(`/live-awareness/${incident.id}`)}
-                      className="text-gray-700 bg-white border border-gray-300 focus:ring-4 focus:ring-gray-200 font-medium rounded-lg text-xs px-3 py-1.5 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 hover:bg-gray-50 transition-colors shadow-sm"
+                      className="text-xs px-3 py-1.5"
                     >
                       View Details
-                    </button>
+                    </Button>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* Footer Disclaimer */}
       <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-4">

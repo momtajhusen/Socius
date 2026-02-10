@@ -3,7 +3,11 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useAlert } from '../hooks/useAlert';
 import { useAuth } from '../context/AuthContext';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 
 const schema = yup.object().shape({
   email: yup.string().email('Please enter a valid email address').required('Email address is required'),
@@ -14,36 +18,68 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { toast } = useAlert();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema)
   });
 
   const onSubmit = async (data) => {
+    setIsSubmitting(true);
     try {
+      // Simulate network delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       const success = await login(data.email, data.password);
       if (success) {
+        toast.success('Successfully logged in!');
         navigate('/dashboard');
+      } else {
+        toast.error('Invalid email or password');
       }
     } catch (error) {
       console.error('Login failed:', error);
+      toast.error('An error occurred during login');
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow-xl rounded-lg sm:px-10 border border-gray-100 dark:border-gray-700 transition-colors duration-200">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="w-full max-w-md mx-auto"
+    >
+    <Card className="py-8 px-4 sm:px-10 border-gray-100 dark:border-gray-700 shadow-xl transition-colors duration-200" noPadding>
       <div className="mb-6 text-center">
-        <h3 className="text-2xl font-bold text-gray-800 dark:text-white">
+        <motion.h3 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.2 }}
+          className="text-2xl font-bold text-gray-800 dark:text-white"
+        >
           Admin Login
-        </h3>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        </motion.h3>
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.3 }}
+          className="mt-1 text-sm text-gray-500 dark:text-gray-400"
+        >
           Authorized access only
-        </p>
+        </motion.p>
       </div>
       
       <div className="border-b border-gray-100 dark:border-gray-700 mb-6"></div>
 
       <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-        <div>
+        <motion.div
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.4 }}
+        >
           <label htmlFor="email" className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
             Email Address
           </label>
@@ -60,9 +96,13 @@ const LoginPage = () => {
               <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.email.message}</p>
             )}
           </div>
-        </div>
+        </motion.div>
 
-        <div>
+        <motion.div
+          initial={{ x: -20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
           <label htmlFor="password" className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-1">
             Password
           </label>
@@ -98,16 +138,22 @@ const LoginPage = () => {
           {errors.password && (
             <p className="mt-1 text-sm text-red-600 dark:text-red-400">{errors.password.message}</p>
           )}
-        </div>
+        </motion.div>
 
-        <div>
-          <button
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.6 }}
+        >
+          <Button
             type="submit"
-            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-socius-red hover:bg-[#A03535] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-socius-red transition-colors duration-200"
+            variant="primary"
+            className="w-full justify-center py-3 bg-socius-red hover:bg-[#A03535]"
+            loading={isSubmitting}
           >
-            Sign In
-          </button>
-        </div>
+            {isSubmitting ? 'Signing in...' : 'Sign In'}
+          </Button>
+        </motion.div>
         
         <div className="flex items-center justify-center">
           <div className="text-sm">
@@ -126,7 +172,8 @@ const LoginPage = () => {
             </p>
          </div>
       </div>
-    </div>
+    </Card>
+    </motion.div>
   );
 };
 

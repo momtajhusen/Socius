@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Info, Shield, Lock, AlertTriangle } from 'lucide-react';
+import { useAlert } from '../hooks/useAlert';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 
 const ScenarioConfigPage = () => {
+  const { confirm, toast } = useAlert();
+  const [isSaving, setIsSaving] = useState(false);
+  const [isPublishing, setIsPublishing] = useState(false);
   const [formData, setFormData] = useState({
     scenarioName: 'Broken Down Vehicle',
     primaryCategory: 'Calm Presence',
@@ -44,18 +51,59 @@ const ScenarioConfigPage = () => {
     setFormData(prev => ({ ...prev, riskTier: tierId }));
   };
 
+  const handleSaveDraft = async () => {
+    setIsSaving(true);
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsSaving(false);
+    toast.success('Scenario draft saved');
+  };
+
+  const handlePublish = async () => {
+    const result = await confirm({
+      title: 'Publish Scenario?',
+      text: "This scenario will become active on the platform.",
+      icon: 'question',
+      confirmButtonText: 'Yes, publish',
+      confirmButtonColor: 'bg-blue-600 hover:bg-blue-700 text-white',
+    });
+    
+    if (result.isConfirmed) {
+      setIsPublishing(true);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      setIsPublishing(false);
+      toast.success('Scenario published successfully');
+    }
+  };
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-44 md:pb-24">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 pb-44 md:pb-24"
+    >
       {/* Header */}
-      <div className="mb-6 pt-6">
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-6 pt-6"
+      >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Scenario Configuration</h1>
         <p className="mt-1 text-gray-600 dark:text-gray-400">Defines how awareness is shared and limited for this scenario.</p>
-      </div>
+      </motion.div>
 
       <div className="space-y-6">
         
         {/* Scenario Basics */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+        <Card className="overflow-hidden p-0">
           <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-3 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Scenario Basics</h2>
           </div>
@@ -109,19 +157,27 @@ const ScenarioConfigPage = () => {
               </div>
             </div>
           </div>
-        </div>
+        </Card>
+        </motion.div>
 
         {/* Incident Risk Tier */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+        <Card className="overflow-hidden p-0">
           <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-3 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Incident Risk Tier</h2>
           </div>
           <div className="p-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               {riskTiers.map((tier) => (
-                <div
+                <motion.div
                   key={tier.id}
                   onClick={() => handleRiskTierSelect(tier.id)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className={`relative rounded-lg border p-4 cursor-pointer flex flex-col transition-all ${
                     formData.riskTier === tier.id
                       ? 'border-gray-400 bg-gray-100 dark:bg-gray-700 shadow-sm ring-1 ring-gray-400'
@@ -143,7 +199,7 @@ const ScenarioConfigPage = () => {
                       <div className="w-3 h-3 bg-gray-100 dark:bg-gray-700 border-b border-r border-gray-400 rotate-45"></div>
                     </div>
                   )}
-                </div>
+                </motion.div>
               ))}
             </div>
             
@@ -180,10 +236,16 @@ const ScenarioConfigPage = () => {
               These rules are automatically applied based on the selected risk tier and cannot be overridden per incident.
             </p>
           </div>
-        </div>
+        </Card>
+        </motion.div>
 
         {/* Safety & Boundary Guidance */}
-        <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+        <Card className="overflow-hidden p-0">
           <div className="bg-gray-50 dark:bg-gray-700/50 px-6 py-3 border-b border-gray-200 dark:border-gray-700">
             <h2 className="text-sm font-semibold text-gray-900 dark:text-white">Safety & Boundary Guidance <span className="font-normal text-gray-500">(Volunteer View)</span></h2>
           </div>
@@ -213,12 +275,18 @@ const ScenarioConfigPage = () => {
               This content is displayed to users viewing awareness details.
             </p>
           </div>
-        </div>
+        </Card>
+        </motion.div>
 
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 md:left-64 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 shadow-lg z-10">
+      <motion.div
+        initial={{ y: 100 }}
+        animate={{ y: 0 }}
+        transition={{ delay: 0.5, type: 'spring', stiffness: 100 }}
+        className="fixed bottom-0 left-0 right-0 md:left-64 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 p-4 shadow-lg z-10"
+      >
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-start gap-3">
              <Shield className="w-5 h-5 text-gray-400 mt-0.5" />
@@ -228,16 +296,28 @@ const ScenarioConfigPage = () => {
              </div>
           </div>
           <div className="flex gap-3 w-full md:w-auto">
-            <button className="flex-1 md:flex-none px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-socius-red">
+            <Button 
+              variant="secondary" 
+              className="flex-1 md:flex-none"
+              onClick={handleSaveDraft}
+              loading={isSaving}
+              disabled={isSaving || isPublishing}
+            >
               Save Draft
-            </button>
-            <button className="flex-1 md:flex-none px-6 py-2 bg-socius-red text-white text-sm font-medium rounded hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-socius-red shadow-sm">
+            </Button>
+            <Button 
+              variant="primary" 
+              className="flex-1 md:flex-none"
+              onClick={handlePublish}
+              loading={isPublishing}
+              disabled={isSaving || isPublishing}
+            >
               Publish Scenario
-            </button>
+            </Button>
           </div>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 

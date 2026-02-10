@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
+import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
+import { useAlert } from '../hooks/useAlert';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 
 // Mock Data matching the screenshot
 const initialUsers = [
@@ -13,9 +17,37 @@ const initialUsers = [
 
 const UsersVolunteersPage = () => {
   const navigate = useNavigate();
+  const { toast } = useAlert();
   const [roleFilter, setRoleFilter] = useState('All');
   const [accountStatusFilter, setAccountStatusFilter] = useState('');
   const [verificationFilter, setVerificationFilter] = useState('');
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Simulated filter handler
+  const handleFilterChange = async (setter, value) => {
+    setIsFiltering(true);
+    await new Promise(resolve => setTimeout(resolve, 800)); // Simulate API delay
+    setter(value);
+    setIsFiltering(false);
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    setIsExporting(false);
+    toast.success('User list exported successfully');
+  };
+
+  const handleClearFilters = async () => {
+    setIsFiltering(true);
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    setRoleFilter('All');
+    setAccountStatusFilter('');
+    setVerificationFilter('');
+    setIsFiltering(false);
+    toast.success('Filters cleared');
+  };
 
   // Helper for Status Dots
   const StatusDot = ({ status, type }) => {
@@ -45,15 +77,26 @@ const UsersVolunteersPage = () => {
   return (
     <div className="p-6 max-w-7xl mx-auto">
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Users & Volunteers</h1>
-        <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-          Account overview for safety and compliance
-        </p>
+      <div className="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Users & Volunteers</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            Account overview for safety and compliance
+          </p>
+        </div>
+        <Button 
+          variant="primary"
+          onClick={handleExport}
+          loading={isExporting}
+          disabled={isExporting}
+          className="w-full md:w-auto"
+        >
+          {isExporting ? 'Exporting...' : 'Export List'}
+        </Button>
       </div>
 
       {/* Filters Section */}
-      <div className="bg-white dark:bg-gray-800 p-5 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 mb-6">
+      <Card className="p-5 mb-6">
         <div className="space-y-6">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             
@@ -67,14 +110,15 @@ const UsersVolunteersPage = () => {
                     {['All', 'User', 'Volunteer', 'Both'].map((r, idx) => (
                       <button
                         key={r}
-                        onClick={() => setRoleFilter(r)}
+                        onClick={() => handleFilterChange(setRoleFilter, r)}
+                        disabled={isFiltering}
                         className={`flex-1 sm:flex-none px-4 py-2 text-sm font-medium border whitespace-nowrap ${
                           idx === 0 ? 'rounded-l-md' : ''
                         } ${idx === 3 ? 'rounded-r-md' : ''} ${
                           roleFilter === r
                             ? 'bg-gray-100 text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600'
                             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700'
-                        } ${idx !== 0 ? '-ml-px' : ''}`}
+                        } ${idx !== 0 ? '-ml-px' : ''} ${isFiltering ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         {r}
                       </button>
@@ -89,14 +133,15 @@ const UsersVolunteersPage = () => {
                     {['Active', 'Limited', 'Suspended'].map((s, idx) => (
                       <button
                         key={s}
-                        onClick={() => setAccountStatusFilter(accountStatusFilter === s ? '' : s)}
+                        onClick={() => handleFilterChange(setAccountStatusFilter, accountStatusFilter === s ? '' : s)}
+                        disabled={isFiltering}
                         className={`flex-1 sm:flex-none px-4 py-2 text-sm font-medium border whitespace-nowrap ${
                           idx === 0 ? 'rounded-l-md' : ''
                         } ${idx === 2 ? 'rounded-r-md' : ''} ${
                           accountStatusFilter === s
                             ? 'bg-gray-100 text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600'
                             : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700'
-                        } ${idx !== 0 ? '-ml-px' : ''}`}
+                        } ${idx !== 0 ? '-ml-px' : ''} ${isFiltering ? 'opacity-50 cursor-not-allowed' : ''}`}
                       >
                         {s}
                       </button>
@@ -112,14 +157,15 @@ const UsersVolunteersPage = () => {
                   {['Verified', 'Pending', 'Failed'].map((v, idx) => (
                     <button
                       key={v}
-                      onClick={() => setVerificationFilter(verificationFilter === v ? '' : v)}
+                      onClick={() => handleFilterChange(setVerificationFilter, verificationFilter === v ? '' : v)}
+                      disabled={isFiltering}
                       className={`flex-1 sm:flex-none px-4 py-2 text-sm font-medium border whitespace-nowrap ${
                         idx === 0 ? 'rounded-l-md' : ''
                       } ${idx === 2 ? 'rounded-r-md' : ''} ${
                         verificationFilter === v
                           ? 'bg-gray-100 text-gray-900 border-gray-300 dark:bg-gray-700 dark:text-white dark:border-gray-600'
                           : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50 dark:bg-gray-800 dark:text-gray-400 dark:border-gray-600 dark:hover:bg-gray-700'
-                      } ${idx !== 0 ? '-ml-px' : ''}`}
+                      } ${idx !== 0 ? '-ml-px' : ''} ${isFiltering ? 'opacity-50 cursor-not-allowed' : ''}`}
                     >
                       {v}
                     </button>
@@ -130,23 +176,30 @@ const UsersVolunteersPage = () => {
             </div>
 
             <div className="w-full lg:w-auto mt-4 lg:mt-0">
-               <button 
+               <Button 
+                variant="secondary"
                 onClick={() => {
                   setRoleFilter('All');
                   setAccountStatusFilter('');
                   setVerificationFilter('');
+                  toast.success('Filters cleared');
                 }}
-                className="w-full lg:w-auto px-6 py-2.5 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors shadow-sm"
+                className="w-full lg:w-auto px-6 py-2.5 shadow-sm"
               >
                 Clear Filters
-              </button>
+              </Button>
             </div>
           </div>
         </div>
-      </div>
+      </Card>
 
       {/* Table */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
+      <Card className="overflow-hidden p-0 relative">
+        {isFiltering && (
+          <div className="absolute inset-0 bg-white/50 dark:bg-gray-800/50 z-10 flex items-center justify-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+          </div>
+        )}
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
             <thead className="bg-gray-100 dark:bg-gray-700/50">
@@ -175,8 +228,14 @@ const UsersVolunteersPage = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {initialUsers.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+              {initialUsers.map((user, index) => (
+                <motion.tr 
+                  key={user.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                >
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {user.id}
                   </td>
@@ -202,19 +261,20 @@ const UsersVolunteersPage = () => {
                     {user.lastActivity}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                    <button 
+                    <Button 
+                      variant="secondary"
                       onClick={() => navigate(`/users/${user.id}`)}
-                      className="text-blue-700 bg-white border border-gray-300 focus:ring-4 focus:ring-blue-100 font-medium rounded-lg text-xs px-3 py-1.5 dark:bg-gray-800 dark:text-blue-400 dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700 hover:bg-blue-50 transition-colors shadow-sm"
+                      className="text-blue-700 dark:text-blue-400 text-xs px-3 py-1.5 shadow-sm"
                     >
                       View Profile
-                    </button>
+                    </Button>
                   </td>
-                </tr>
+                </motion.tr>
               ))}
             </tbody>
           </table>
         </div>
-      </div>
+      </Card>
 
       {/* Footer Disclaimer */}
       <div className="mt-8 border-t border-gray-200 dark:border-gray-700 pt-4">

@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useAlert } from '../hooks/useAlert';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 import { 
   Heart, 
   HandHelping, 
@@ -15,9 +19,11 @@ import {
 } from 'lucide-react';
 
 const ContentManagementPage = () => {
+  const { confirm, toast } = useAlert();
   const [activeTab, setActiveTab] = useState('Categories');
   const [isEditPanelOpen, setIsEditPanelOpen] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Mock Data
   const [categories, setCategories] = useState([
@@ -56,10 +62,40 @@ const ContentManagementPage = () => {
     setEditingCategory(null);
   };
 
-  const handleSave = () => {
-    // Logic to save changes would go here
+  const handleSave = async () => {
+    setIsSaving(true);
+    // Simulate API delay
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    
+    // Update local state to simulate persistence
+    if (editingCategory) {
+      setCategories(prev => prev.map(c => c.id === editingCategory.id ? editingCategory : c));
+    }
+
+    setIsSaving(false);
+    toast.success('Category updated successfully');
     setIsEditPanelOpen(false);
     setEditingCategory(null);
+  };
+
+  const handleDelete = async (categoryName) => {
+    const result = await confirm({
+      title: 'Delete Category?',
+      text: `Are you sure you want to delete "${categoryName}"? This cannot be undone.`,
+      icon: 'warning',
+      confirmButtonText: 'Yes, delete it',
+      confirmButtonColor: 'bg-red-600 hover:bg-red-700 text-white',
+    });
+    
+    if (result.isConfirmed) {
+      // Simulate API delay
+      const toastId = toast.loading('Deleting category...');
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      setCategories(prev => prev.filter(c => c.name !== categoryName));
+      toast.dismiss(toastId);
+      toast.success(`Category "${categoryName}" deleted`);
+    }
   };
 
   const renderIcon = (iconName) => {
@@ -103,7 +139,7 @@ const ContentManagementPage = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex flex-1 bg-white dark:bg-gray-800 shadow rounded-b-lg overflow-hidden relative">
+      <Card className="flex flex-1 shadow rounded-t-none rounded-b-lg overflow-hidden relative p-0">
         
         {/* Left Side: Table */}
         <div className="flex-1 overflow-y-auto p-4 md:p-6">
@@ -127,8 +163,13 @@ const ContentManagementPage = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
-                  {categories.map((category) => (
-                    <tr key={category.id}>
+                  {categories.map((category, index) => (
+                    <motion.tr 
+                      key={category.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
                       <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 dark:text-white sm:pl-6">
                         {category.name}
                       </td>
@@ -144,20 +185,24 @@ const ContentManagementPage = () => {
                         </div>
                       </td>
                       <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500 dark:text-gray-400">
-                        <div className="flex items-center space-x-2">
+                        <div className="flex items-center space-x-3">
                           <button 
                             onClick={() => handleEdit(category)}
-                            className="text-socius-red hover:text-brand-dark font-medium transition-colors"
+                            className="text-socius-red hover:text-brand-dark transition-colors"
+                            title="Edit"
                           >
-                            Edit
+                            <Edit2 className="w-4 h-4" />
                           </button>
-                          <span className="text-gray-300">|</span>
-                          <button className="text-socius-red hover:text-brand-dark font-medium transition-colors">
-                            Disable
+                          <button 
+                            onClick={() => handleDelete(category.name)}
+                            className="text-socius-red hover:text-brand-dark transition-colors"
+                            title="Disable"
+                          >
+                            <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                       </td>
-                    </tr>
+                    </motion.tr>
                   ))}
                 </tbody>
               </table>
@@ -218,8 +263,15 @@ const ContentManagementPage = () => {
         </div>
 
         {/* Right Side: Edit Panel */}
+        <AnimatePresence>
         {isEditPanelOpen && (
-          <div className="absolute inset-0 md:inset-auto md:right-4 md:top-4 md:bottom-4 md:w-96 bg-white dark:bg-gray-800 md:border border-gray-200 dark:border-gray-700 flex flex-col md:shadow-2xl z-20 md:rounded-xl animate-in slide-in-from-right duration-300">
+          <motion.div 
+            initial={{ x: "100%", opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: "100%", opacity: 0 }}
+            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+            className="absolute inset-0 md:inset-auto md:right-4 md:top-4 md:bottom-4 md:w-96 bg-white dark:bg-gray-800 md:border border-gray-200 dark:border-gray-700 flex flex-col md:shadow-2xl z-20 md:rounded-xl"
+          >
             <div className="px-4 md:px-6 py-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between md:rounded-t-xl">
               <h2 className="text-lg font-semibold text-gray-900 dark:text-white">Edit Category</h2>
               <button 
@@ -283,23 +335,27 @@ const ContentManagementPage = () => {
             </div>
 
             {/* Footer Buttons */}
-            <div className="px-4 md:px-6 py-4 border-t border-gray-200 dark:border-gray-700 flex space-x-3">
-              <button
+            <div className="p-4 md:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700/50 md:rounded-b-xl flex gap-3">
+              <Button 
+                variant="primary" 
+                className="flex-1"
                 onClick={handleSave}
-                className="flex-1 md:flex-none px-4 py-2 bg-socius-red text-white text-sm font-medium rounded hover:bg-brand-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-socius-red"
+                loading={isSaving}
               >
-                Save
-              </button>
-              <button
+                {isSaving ? 'Saving...' : 'Save Changes'}
+              </Button>
+              <Button 
+                variant="secondary" 
+                className="flex-1"
                 onClick={handleClosePanel}
-                className="flex-1 md:flex-none px-4 py-2 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-socius-red"
               >
                 Cancel
-              </button>
+              </Button>
             </div>
-          </div>
+          </motion.div>
         )}
-      </div>
+        </AnimatePresence>
+      </Card>
 
       {/* Bottom Disclaimer */}
       <div className="mt-6 bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded p-3 text-center">

@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import Card from '../components/common/Card';
+import Button from '../components/common/Button';
 
 // Mock Data matching the screenshot
 const initialRequests = [
@@ -17,6 +20,14 @@ const VerificationQueuePage = () => {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState('Pending');
   const [dateFilter, setDateFilter] = useState('Today');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleFilterChange = async (setter, value) => {
+    setIsLoading(true);
+    await new Promise(resolve => setTimeout(resolve, 800));
+    setter(value);
+    setIsLoading(false);
+  };
 
   // Simple filter component to match the text-based design
   const FilterGroup = ({ label, options, selected, onSelect }) => (
@@ -45,99 +56,137 @@ const VerificationQueuePage = () => {
   );
 
   return (
-    <div className="space-y-6">
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
       {/* Header */}
-      <div>
+      <motion.div
+        initial={{ opacity: 0, y: -20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
         <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Verification Queue</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
           Pending identity reviews for platform access
         </p>
-      </div>
+      </motion.div>
 
       {/* Filters Card */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-        <div className="flex flex-wrap gap-6 items-center">
-          <FilterGroup 
-            label="Status" 
-            options={['Pending', 'Approved', 'Rejected']} 
-            selected={statusFilter} 
-            onSelect={setStatusFilter} 
-          />
-          
-          <div className="hidden sm:block w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
-          
-          <FilterGroup 
-            label="Submission Date" 
-            options={['Today', 'Last 7 days', 'Last 30 days']} 
-            selected={dateFilter} 
-            onSelect={setDateFilter} 
-          />
-        </div>
-      </div>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+      >
+        <Card className="p-4 border-0">
+          <div className="flex flex-wrap gap-6 items-center">
+            <FilterGroup 
+              label="Status" 
+              options={['Pending', 'Approved', 'Rejected']} 
+              selected={statusFilter} 
+              onSelect={(val) => handleFilterChange(setStatusFilter, val)} 
+            />
+            
+            <div className="hidden sm:block w-px h-4 bg-gray-300 dark:bg-gray-600"></div>
+            
+            <FilterGroup 
+              label="Submission Date" 
+              options={['Today', 'Last 7 days', 'Last 30 days']} 
+              selected={dateFilter} 
+              onSelect={(val) => handleFilterChange(setDateFilter, val)} 
+            />
+          </div>
+        </Card>
+      </motion.div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-100 dark:bg-gray-700/50">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                  User ID
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                  Role Requested
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                  Submitted On
-                </th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                  Status
-                </th>
-                <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {initialRequests.map((request) => (
-                <tr key={request.id} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                    {request.id}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                    {request.role}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                    {request.submittedOn}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
-                    {request.status}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                    <button 
-                      onClick={() => navigate(`/verification/${request.id}`)}
-                      className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 font-medium rounded px-4 py-1 text-sm shadow-sm dark:bg-gray-800 dark:text-gray-300 dark:border-gray-600 dark:hover:bg-gray-700 transition-colors"
-                    >
-                      Review
-                    </button>
-                  </td>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        <Card className="overflow-hidden p-0 border-0 relative">
+          {isLoading && (
+            <div className="absolute inset-0 bg-white/50 dark:bg-gray-800/50 z-10 flex items-center justify-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-white"></div>
+            </div>
+          )}
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-100 dark:bg-gray-700/50">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
+                    User ID
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
+                    Role Requested
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
+                    Submitted On
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center text-xs font-bold text-gray-800 dark:text-gray-200 uppercase tracking-wider">
+                    Action
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                {initialRequests.map((request, index) => (
+                  <motion.tr 
+                    key={request.id}
+                    initial={{ opacity: 0, x: -10 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 + index * 0.05 }}
+                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                      {request.id}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                      {request.role}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                      {request.submittedOn}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300">
+                      {request.status}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                      <Button 
+                        variant="secondary"
+                        onClick={() => navigate(`/verification/${request.id}`)}
+                        className="px-4 py-1 text-sm shadow-sm"
+                      >
+                        Review
+                      </Button>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </motion.div>
 
       {/* Footer Disclaimer */}
-      <div className="pt-2">
+      <motion.div 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
+        className="pt-2"
+      >
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Verification is used only to confirm account authenticity.
         </p>
         <p className="text-sm text-gray-600 dark:text-gray-400">
           Socius does not assess character, intent, or behavior.
         </p>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };
 
